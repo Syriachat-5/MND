@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c0b0a">
+<title>MND | متجر ملابس</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app"></div>
+<div id="tst"></div>
+<script src="common.js"></script>
+<script>
+let shown=8;
+const filt=()=>{let ps=D.products.filter(p=>p.on&&(cat==='الكل'||p.cat===cat)&&(!sq||(p.name+p.cat).includes(sq)));if(sort==='lo')ps=[...ps].sort((a,b)=>a.price-b.price);if(sort==='hi')ps=[...ps].sort((a,b)=>b.price-a.price);return ps};
+const gridHTML=()=>filt().slice(0,shown).map(p=>`<div class="pc" onclick="openP(${p.id})"><div class="pv" style="background:${esc(p.color)}">${pvIn(p)}${p.stock<=0?'<span class="tg">نفذت الكمية</span>':p.stock<=5?`<span class="tg" style="background:#d97706">آخر ${p.stock} قطع</span>`:''}</div><div class="i"><small>${esc(p.cat)}</small><b style="display:block">${esc(p.name)}</b><span class="pr">${usd(p.price)}</span>${cr(p.price)}</div></div>`).join('')||'<p style="grid-column:1/-1;text-align:center;color:var(--mut)">لا توجد منتجات مطابقة.</p>';
+const moreHTML=()=>filt().length>shown?'<button class="btn o" onclick="shown+=8;refresh()">عرض المزيد من المنتجات</button>':'';
+function refresh(){$('grid').innerHTML=gridHTML();$('mw').innerHTML=moreHTML()}
+const go=id=>document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
+const brs=()=>(D.settings.branches||[]).filter(b=>b.n&&b.p);
+const ur=u=>{u=String(u||'').trim();return u?(/^https?:\/\//i.test(u)?u:'https://'+u.replace(/^\/+/,'')):''};
+const ICONS={wa:`<svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>`,
+fb:`<svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M13.5 21v-8h2.7l.4-3.2h-3.1V7.8c0-.9.3-1.5 1.6-1.5h1.7V3.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4.1 1.5-4.1 4.2v2.3H7.5V13h2.8v8z"/></svg>`,
+ig:`<svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><rect x="3.5" y="3.5" width="17" height="17" rx="5" fill="none" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17.2" cy="6.8" r="1.2"/></svg>`,
+tg:`<svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M21.5 3.6 2.6 10.9c-.9.4-.9 1 0 1.300l4.800 1.500 1.800 5.600c.2.600.4.800.9.800s.6-.2.900-.5l2.300-2.300 4.700 3.500c.9.5 1.500.2 1.700-.8l3-14.300c.3-1.200-.5-1.800-1.600-1.300zM9.200 13.300l9.100-5.700c.4-.3.800-.1.500.2l-7.600 6.900-.3 3.300z"/></svg>`,
+tt:`<svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><path d="M16.600 3c.3 2.400 1.700 3.900 4 4.100v3.100c-1.400.1-2.700-.3-4-1.100v6.100a6.100 6.100 0 1 1-6.100-6.100c.3 0 .6 0 .9.100v3.200a3 3 0 1 0 2.100 2.800V3z"/></svg>`,
+yt:`<svg viewBox="0 0 24 24" width="24" height="24" fill="#fff"><rect x="2" y="5" width="20" height="14" rx="4.500"/><path d="M10 9l5.500 3-5.500 3z" fill="#e0201b"/></svg>`};
+const soc=()=>{const s=D.settings,L=[['wa',wan()?'https://wa.me/'+wan():'','واتساب'],['fb',ur(s.fb),'فيسبوك'],['ig',ur(s.ig),'انستغرام'],['tg',ur(s.tg),'تيليغرام'],['tt',ur(s.tt),'تيك توك'],['yt',ur(s.yt),'يوتيوب']].filter(x=>x[1]);return `<div class="soc">${L.map(x=>`<a class="s-${x[0]}" href="${esc(x[1])}" target="_blank" rel="noopener" aria-label="${x[2]}" title="${x[2]}">${ICONS[x[0]]}</a>`).join('')}</div>`};
+const dg=x=>String(x||'').replace(/\D/g,'');
+function storeView(){const s=D.settings,n=cart.reduce((a,c)=>a+c.q,0),B=brs();
+return `<header class="hd">${lg(46)}<nav class="nv"><a onclick="go('about')">من نحن</a><a onclick="go('shop')">جميع المنتجات</a><a onclick="go('contact')">وسائل التواصل</a></nav><span><button class="ib" onclick="ordOpen=true;keep()">📦 طلباتي${upd().length?` <span class="bd" style="background:var(--red)">${upd().length}</span>`:''}</button> <button class="ib" onclick="cartOpen=true;keep()">🛍️ <span class="bd">${n}</span></button></span></header>
+<section class="hero"><small class="eyb">مجموعة جديدة</small><h1>${esc(s.hero)}</h1><p>${esc(s.sub)}</p><button class="btn gold" onclick="go('shop')">تصفح المنتجات والعروض</button><a class="btn o" href="https://wa.me/${wan()}" target="_blank" rel="noopener">تواصل معنا مباشرة</a></section>
+<section class="sec" id="about"><h2 class="st2">من نحن</h2><p class="ab">${esc(s.about)}</p></section>
+<main id="shop" style="padding-top:28px"><h2 class="st2">المنتجات</h2><div class="tools"><input class="inp" placeholder="🔍 ابحث عن منتج..." value="${esc(sq)}" oninput="sq=this.value;shown=8;refresh()"><select class="inp" onchange="sort=this.value;keep()"><option value="def">الافتراضي</option><option value="lo" ${sort==='lo'?'selected':''}>الأرخص</option><option value="hi" ${sort==='hi'?'selected':''}>الأعلى سعرًا</option></select></div>
+<div class="chips">${cats.map(c=>`<button class="chip ${c===cat?'on':''}" onclick="cat='${c}';shown=8;keep()">${c}</button>`).join('')}</div>
+<div class="grid" id="grid">${gridHTML()}</div><div class="more" id="mw">${moreHTML()}</div></main>
+${B.length?`<section class="sec"><h2 class="st2">اختر الفرع المناسب للاستفسار</h2><div class="brg">${B.map(b=>`<div class="bc"><h4>${esc(b.n)}</h4><p dir="ltr">${esc(b.p)}</p><a href="https://wa.me/${dg(b.p)}" target="_blank" rel="noopener">مراسلة</a></div>`).join('')}</div></section>`:''}
+<section class="sec" id="contact"><h2 class="st2">وسائل التواصل والموقع الرئيسي</h2><div class="ci"><div class="row"><span>الموقع الرئيسي</span><b>${esc(s.addr)}</b></div>${s.email?`<div class="row"><span>البريد الإلكتروني</span><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></div>`:''}<div class="row" style="display:block;text-align:center;border:0"><div style="margin-bottom:8px;color:var(--mut)">تابعنا على</div>${soc()}</div></div></section>
+<footer class="ft2">${lg(110)}<p>أزياء عصرية بجودة عالية</p>${soc()}<div class="ft" style="padding:10px 0 0"><a href="admin.html">لوحة التحكم</a> · © ${esc(s.name)} — جميع الحقوق محفوظة</div></footer>
+${sel?prodSheet():''}${cartOpen?cartSheet():''}${ordOpen?ordSheet():''}${invSheet()}${waWidget()}`}
+function openP(id){sel=D.products.find(p=>p.id===id);size=sel.sizes.split(',')[0];gi=0;keep()}
+function setG(i){gi=i;$('gm').src=sel.imgs[i];document.querySelectorAll('.gth img').forEach((e,j)=>e.classList.toggle('on',j===i))}
+function prodSheet(){const p=sel;return `<div class="ov" onclick="if(event.target===this){sel=null;keep()}"><div class="sh"><div class="pv" style="background:${esc(p.color)};height:260px;border-radius:14px;font-size:90px" ${p.imgs&&p.imgs.length>1?'onclick="setG((gi+1)%sel.imgs.length)"':''}>${p.imgs&&p.imgs.length?`<img id="gm" src="${p.imgs[gi]||p.imgs[0]}" alt="${esc(p.name)}">`:esc(p.emoji)}</div>${p.imgs&&p.imgs.length>1?`<div class="gth">${p.imgs.map((u,i)=>`<img src="${u}" class="${i===gi?'on':''}" onclick="setG(${i})" alt="">`).join('')}</div>`:''}<h3 style="margin-top:12px">${esc(p.name)}</h3><span class="pr" style="font-size:20px">${usd(p.price)}</span>${cr(p.price)}<p style="color:var(--mut)">${esc(p.cat)} · المتوفر: ${p.stock}</p>
+<label>المقاس</label><div class="sz">${p.sizes.split(',').map(z=>`<button class="${z===size?'on':''}" onclick="size='${esc(z)}';keep()">${esc(z)}</button>`).join('')}</div>
+<button class="btn w" ${p.stock<=0?'disabled style="opacity:.4"':''} onclick="addC()">أضف إلى السلة</button></div></div>`}
+function addC(){const f=cart.find(c=>c.id===sel.id&&c.size===size);f?f.q++:cart.push({id:sel.id,size,q:1});sel=null;toast('تمت الإضافة إلى السلة');keep()}
+const total=()=>cart.reduce((a,c)=>a+c.q*D.products.find(p=>p.id===c.id).price,0);
+const pays=()=>{const p=D.settings.pay,a=[];if(p.sham.on)a.push(['sham','شام كاش (QR)']);if(p.cod.on)a.push(['cod','الدفع عند الاستلام']);return a};
+const calc=()=>{const sub=total(),tax=0,ship=cart.length?+D.settings.ship:0;return{sub,tax,ship,total:Math.round((sub+tax+ship)*100)/100}};
+const d2b=u=>{const[a,b]=u.split(','),m=a.match(/:(.*?);/)[1],t=atob(b),n=new Uint8Array(t.length);for(let i=0;i<t.length;i++)n[i]=t.charCodeAt(i);return new Blob([n],{type:m})};
+async function dlQR(){try{await saveBlob('MND-ShamCash-QR.png',d2b(D.settings.pay.sham.qr))}catch(e){toast('اضغط مطولًا على الصورة لحفظها')}}
+const shamBox=()=>{const h=D.settings.pay.sham;return `<div class="qrb">${h.qr?`<img src="${h.qr}" alt="QR شام كاش" class="qri"><button class="btn o w" onclick="dlQR()">⬇ تنزيل رمز QR</button><p style="font-size:12px;color:var(--mut);margin-top:4px">أو اضغط مطولًا على الصورة لحفظها</p>`:'<p style="color:var(--mut)">لم يضف المتجر رمز QR بعد.</p>'}${h.acc?`<div class="row" style="border:0"><span>رقم الحساب</span><b dir="ltr">${esc(h.acc)}</b></div>`:''}<small style="color:var(--mut);display:block;margin-bottom:6px">امسح الرمز أو حوّل إلى الحساب، ثم اكتب رقم العملية:</small><input class="inp" id="cr" placeholder="رقم عملية التحويل" value="${esc(checkout.r||'')}"></div>`};
+function cartSheet(){const s=D.settings,k=calc(),pay=pays();if(!pay.find(x=>x[0]===pm))pm=pay[0]?.[0]||'';
+const opts=D.products.filter(p=>p.on&&p.stock>0).map(p=>`<optgroup label="${esc(p.name)} — ${usd(p.price)}">${p.sizes.split(',').map(z=>`<option value="${p.id}|${esc(z)}">${esc(p.name)} — ${esc(z)}</option>`).join('')}</optgroup>`).join('');
+return `<div class="ov" onclick="if(event.target===this){keepForm();cartOpen=false;keep()}"><div class="sh"><h3>سلة التسوق</h3>
+<label>أضف منتجًا إلى طلبك</label><select class="inp" onchange="addSel(this.value)"><option value="">— اختر المنتج والمقاس —</option>${opts}</select>
+${cart.map((c,i)=>{const p=D.products.find(x=>x.id===c.id);return `<div class="row"><div>${esc(p.name)}<small style="display:block;color:var(--mut)">المقاس ${esc(c.size)} · ${usd(p.price)}</small></div><div class="q"><button onclick="qty(${i},-1)">−</button>${c.q}<button onclick="qty(${i},1)">+</button></div></div>`}).join('')||'<p style="color:var(--mut)">السلة فارغة.</p>'}
+${cart.length?`<div class="inv"><div class="row"><span>المجموع الفرعي</span><span>${usd(k.sub)}</span></div>${k.tax?`<div class="row"><span>الضريبة (${s.tax}%)</span><span>${usd(k.tax)}</span></div>`:''}<div class="row"><span>التوصيل</span><span>${usd(k.ship)}</span></div><div class="row" style="border:0;font-size:18px"><b>الإجمالي النهائي</b><b style="color:var(--ac)">${usd(k.total)}</b></div><div style="text-align:left">${cr(k.total)}</div></div>
+<label style="margin-top:12px">طريقة الدفع</label><div class="sz">${pay.map(x=>`<button class="${x[0]===pm?'on':''}" onclick="keepForm();pm='${x[0]}';keep()">${x[1]}</button>`).join('')||'<span style="color:var(--mut)">لا توجد طريقة دفع متاحة</span>'}</div>${pm==='sham'?shamBox():''}
+<input class="inp" id="cn" placeholder="الاسم" value="${esc(checkout.n??me().name)}"><input class="inp" id="cp" placeholder="رقم الهاتف" value="${esc(checkout.p??me().phone)}"><input class="inp" id="ca" placeholder="العنوان" value="${esc(checkout.a??me().addr)}">
+<button class="btn w" onclick="order()">إتمام الطلب</button>`:''}</div></div>`}
+function addSel(v){if(!v)return;keepForm();const[i,z]=v.split('|'),f=cart.find(c=>c.id==i&&c.size===z);f?f.q++:cart.push({id:+i,size:z,q:1});keep()}
+const wan=()=>String(D.settings.wa||'').replace(/\D/g,'');
+const waWidget=()=>`<a class="wab" href="https://wa.me/${wan()}?text=${encodeURIComponent('مرحبًا، أريد الاستفسار عن منتجات '+D.settings.name)}" target="_blank" rel="noopener" aria-label="تواصل عبر واتساب"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>`;
+function qty(i,d){cart[i].q+=d;if(cart[i].q<=0)cart.splice(i,1);keepForm();keep()}
+function keepForm(){if($('cn'))checkout={n:$('cn').value,p:$('cp').value,a:$('ca').value,r:$('cr')?.value??checkout.r}}
+function order(){keepForm();if(!checkout.n||!checkout.p||!checkout.a){toast('الرجاء تعبئة الاسم والهاتف والعنوان');return}
+if(!pm){toast('لا توجد طريقة دفع متاحة');return}
+const k=calc(),pl=pays().find(x=>x[0]===pm)[1];
+const items=cart.map(c=>{const p=D.products.find(x=>x.id===c.id);p.stock=Math.max(0,p.stock-c.q);return{n:p.name,s:c.size,q:c.q,pr:p.price}});
+const o={id:Date.now(),no:'MND-'+(1001+D.orders.length),dev:DEV,date:new Date().toLocaleDateString('ar'),name:checkout.n,phone:checkout.p,addr:checkout.a,items,sub:k.sub,tax:k.tax,ship:k.ship,total:k.total,rS:+D.settings.rSYP||0,rT:+D.settings.rTRY||0,pay:pl,ref:checkout.r||'',st:'جديد'};
+SEEN[o.id]=o.st;saveSeen();let cu=D.customers.find(c=>c.dev===DEV);if(!cu){cu={dev:DEV,first:o.date};D.customers.push(cu)}Object.assign(cu,{name:o.name,phone:o.phone,addr:o.addr,last:o.date});
+D.orders.unshift(o);save();
+const msg=`طلب جديد ${o.no} من ${D.settings.name}\n`+items.map(i=>`• ${i.n} (${i.s}) × ${i.q}`).join('\n')+`\nالمجموع الفرعي: ${usd(o.sub)}\n`+(o.tax?`الضريبة: ${usd(o.tax)}\n`:'')+`التوصيل: ${usd(o.ship)}\nالإجمالي: ${usd(o.total)}\n${crl(o.total,o).map(x=>'≈ '+x+'\n').join('')}الدفع: ${pl}${o.ref?' (رقم العملية '+o.ref+')':''}\nالاسم: ${o.name}\nالهاتف: ${o.phone}\nالعنوان: ${o.addr}`;
+window.open('https://wa.me/'+wan()+'?text='+encodeURIComponent(msg),'_blank');
+cart=[];checkout={};cartOpen=false;inv=o;toast('تم تسجيل طلبك '+o.no);keep()}
+const steps=['جديد','قيد التجهيز','مكتمل'];
+function tl(o){if(o.st==='ملغي')return '<p style="color:var(--red);font-weight:800;margin-top:6px">✕ تم إلغاء الطلب</p>';const k=steps.indexOf(o.st);return `<div style="display:flex;gap:6px;margin-top:8px">${steps.map((s,i)=>`<div style="flex:1;text-align:center;font-size:12px;font-weight:600;color:${i<=k?'var(--grn)':'var(--mut)'}"><div style="height:5px;border-radius:3px;background:${i<=k?'var(--grn)':'var(--line)'};margin-bottom:4px"></div>${s}</div>`).join('')}</div>`}
+function ordSheet(){const L=mine();return `<div class="ov" onclick="if(event.target===this)closeOrd()"><div class="sh"><h3>طلباتي</h3><p style="color:var(--mut);font-size:13px;margin-bottom:8px">رمز جهازك: <b dir="ltr">${DEV}</b> — تظهر هنا طلباتك فقط.</p>${L.map(o=>`<div class="li" style="display:block"><div style="display:flex;justify-content:space-between"><b>${esc(o.no)}</b>${SEEN[o.id]!==o.st?'<span class="pill" style="background:var(--red);color:#fff">محدّث</span>':`<span class="pill">${esc(o.st)}</span>`}</div><small>${esc(o.date)} · ${usd(o.total)}</small><p style="font-size:14px;margin-top:4px">${o.items.map(i=>`${esc(i.n)} (${esc(i.s)}) ×${i.q}`).join('، ')}</p>${tl(o)}<button class="mini" style="margin-top:8px" onclick="inv=D.orders.find(x=>x.id===${o.id});keep()">عرض الفاتورة</button> <button class="mini" style="margin-top:8px" onclick="dlInv(${o.id},'pdf')">⬇ تحميل PDF</button></div>`).join('')||'<p style="color:var(--mut)">لا توجد طلبات من هذا الجهاز بعد.</p>'}<button class="btn o w" onclick="closeOrd()">إغلاق</button></div></div>`}
+function closeOrd(){mine().forEach(o=>SEEN[o.id]=o.st);saveSeen();ordOpen=false;keep()}
+const render=()=>{$('app').innerHTML=storeView();window.scrollTo?.(0,0)};
+const keep=()=>{const y=scrollY;$('app').innerHTML=storeView();scrollTo(0,y)};
+window.addEventListener('storage',e=>{if(e.key!==K||!e.newValue)return;try{D=JSON.parse(e.newValue)}catch(x){return}D.customers=D.customers||[];const u=upd();if(u.length)toast('تحديث على طلبك '+u[0].no+': '+u[0].st+' — اضغط لعرض الفاتورة',()=>{ordOpen=true;keep()});if(!sel&&!cartOpen)keep()});
+{const u=upd();if(u.length)toast('تحديث على طلبك '+u[0].no+': '+u[0].st+' — اضغط لعرض الفاتورة',()=>{ordOpen=true;keep()})}
+render();
+</script>
+</body>
+</html>
