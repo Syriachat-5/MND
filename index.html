@@ -39,7 +39,7 @@ return `<header class="hd">${lg(46)}<nav class="nv"><a onclick="go('about')">م�
 <div class="grid" id="grid">${gridHTML()}</div><div class="more" id="mw">${moreHTML()}</div></main>
 ${B.length?`<section class="sec"><h2 class="st2">اختر الفرع المناسب للاستفسار</h2><div class="brg">${B.map(b=>`<div class="bc"><h4>${esc(b.n)}</h4><p dir="ltr">${esc(b.p)}</p><a href="https://wa.me/${dg(b.p)}" target="_blank" rel="noopener">مراسلة</a></div>`).join('')}</div></section>`:''}
 <section class="sec" id="contact"><h2 class="st2">وسائل التواصل والموقع الرئيسي</h2><div class="ci"><div class="row"><span>الموقع الرئيسي</span><b>${esc(s.addr)}</b></div>${s.email?`<div class="row"><span>البريد الإلكتروني</span><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></div>`:''}<div class="row" style="display:block;text-align:center;border:0"><div style="margin-bottom:8px;color:var(--mut)">تابعنا على</div>${soc()}</div></div></section>
-<footer class="ft2">${lg(110)}<p>أزياء عصرية بجودة عالية</p>${soc()}<div class="ft" style="padding:10px 0 0"><a href="admin.html">.</a> · © ${esc(s.name)} — جميع الحقوق محفوظة</div></footer>
+<footer class="ft2">${lg(110)}<p>أزياء عصرية بجودة عالية</p>${soc()}<div class="ft" style="padding:10px 0 0"><a href="admin1.html">.</a> · © ${esc(s.name)} — جميع الحقوق محفوظة</div></footer>
 ${sel?prodSheet():''}${cartOpen?cartSheet():''}${ordOpen?ordSheet():''}${invSheet()}${waWidget()}`}
 function openP(id){sel=D.products.find(p=>p.id===id);size=sel.sizes.split(',')[0];gi=0;keep()}
 function setG(i){gi=i;$('gm').src=sel.imgs[i];document.querySelectorAll('.gth img').forEach((e,j)=>e.classList.toggle('on',j===i))}
